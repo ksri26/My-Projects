@@ -1,0 +1,74 @@
+#Importing the data
+import numpy as np
+import pandas as pd       
+import tensorflow as tf   
+from tensorflow import keras
+from tensorflow.keras import layers
+from sklearn.model_selection import train_test_split
+
+#Importing the excel spreadsheet into Tensorflow
+train_data = pd.read_excel('C:/Users/karan/Desktop/coverage_time_logistic.xlsx')
+#Displaying first 5 entries in Tensorflow
+train_data.head(5)
+
+
+
+#We would normalize entries that have variation in them. Columns that have 0 as entries and the last column have no variation
+#Normalization method is done by subtracting from the mean and dividing by standard deviation
+#
+coverage_time_mean = train_data['Coverage time'].mean()
+Para1_mean = train_data['Para 1'].mean()
+#Para2_mean = train_data['Para 2'].mean()
+#Para3_mean = train_data['Para 3'].mean()
+#Para4_mean = train_data['Para 4'].mean()
+#Para5_mean = train_data['Para 5'].mean()
+IC1_mean = train_data['IC 1'].mean()
+#IC2_mean = train_data['IC 2'].mean()
+#IC3_mean = train_data['IC 3'].mean()
+#IC4_mean = train_data['IC 4'].mean()
+
+coverage_time_std = train_data['Coverage time'].std()
+Para1_std = train_data['Para 1'].std()
+#Para2_std = train_data['Para 2'].std()
+#Para3_std = train_data['Para 3'].std()
+#Para4_std = train_data['Para 4'].std()
+#Para5_std = train_data['Para 5'].std()
+IC1_std = train_data['IC 1'].std()
+#IC2_std = train_data['IC 2'].std()
+#IC3_std = train_data['IC 3'].std()
+#IC4_std = train_data['IC 4'].std()
+
+train_data['Coverage time'] = (train_data['Coverage time'] - coverage_time_mean) / coverage_time_std
+train_data['Para 1'] = (train_data['Para 1'] - Para1_mean) / Para1_std
+#train_data['Para 2'] = (train_data['Para 2'] - Para2_mean) / Para2_std
+#train_data['Para 3'] = (train_data['Para 3'] - Para3_mean) / Para3_std
+#train_data['Para 4'] = (train_data['Para 4'] - Para4_mean) / Para4_std
+#train_data['Para 5'] = (train_data['Para 5'] - Para5_mean) / Para5_std
+train_data['IC 1'] = (train_data['IC 1'] - IC1_mean) / IC1_std
+#train_data['IC 2'] = (train_data['IC 2'] - IC2_mean) / IC2_std
+#train_data['IC 3'] = (train_data['IC 3'] - IC3_mean) / IC3_std
+#train_data['IC 4'] = (train_data['IC 4'] - IC4_mean) / IC4_std
+
+#We would assign each column according to its respective variables
+X_train = train_data.drop('Coverage time', axis=1)
+y_train = train_data['Coverage time']
+
+#We would split the training and testing data with a step size of 0.2
+X_train, X_test, y_train, y_test = train_test_split(X_train.values, y_train.values, test_size=0.2)
+
+#We use keras.sequential() to setup the Neural networks
+model = tf.keras.Sequential()
+# Adds a densely-connected layer with 64 units to the model:
+model.add(layers.Dense(64, activation='relu'))
+# Add another:
+model.add(layers.Dense(64, activation='relu'))
+# Add a softmax layer with 10 output units:
+model.add(layers.Dense(10, activation='softmax'))
+#Compiling the model
+model.compile(optimizer='adam', 
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.fit(X_train, y_train, epochs=10)
+
+
