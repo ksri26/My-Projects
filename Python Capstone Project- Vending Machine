@@ -1,0 +1,141 @@
+price_list = ['#',2.5, 2.00, 1.50, 2.20, 2.50, 2.20, 1.50, 2.00, 2.40]
+selection_list = ['#','Gatorade Lemon Flavor 250ml','Lays Chilli Flavor 50g','Skittles Original Flavour 100g','Oreo Chocolate Bar 100g','Coca Cola Original 500ml','Hiland Chocolate Flavor Milk 500ml','Minute Maid Tropical Juice 250ml','Fiji Pure Drinking Water 500ml','Chips Ahoy Choco Chip Cookies 250g']
+
+class InventoryList:
+        
+    def options_list(self):
+        print('NOTE: If you had selected y under "Do you want to continue shopping" tab by mistake, select any item from the list below, then type "0" under "Quantity needed tab" ')
+        print('||' + '1. Gatorade Lemon Flavor 250ml' + '||' + '2. Lays Chilli Flavor 50g' + '||' '3. Skittles Original Flavour 100g' + '||')
+        print('\n')
+        print('||' + '4. Oreo Chocolate Bar 100g' + '||' + '5. Coca Cola Original 500ml' + '||' '6. Hiland Chocolate Flavor Milk 500ml' + '||')
+        print('\n')
+        print('||' + '7. Minute Maid Tropical Juice 250ml' + '||' + '8. Fiji Pure Drinking Water 500ml' + '||' + '9. Chips Ahoy Choco Chip Cookies 250g' + '||')
+        
+    def select_option(self):
+        while True:
+            try:
+                self.x = int(input('Please select the items you want to purchase: '))
+            except:
+                print('Invalid response, please try again!: ')
+            else:
+                if self.x <= 0 or self.x > 9:
+                    print('Invalid response, please try again!: ')
+                else:
+                    break
+        return self.x
+                             
+    def quantity_needed(self):
+        if self.x == 1 or self.x == 2 or self.x == 3 or self.x == 4 or self.x == 5 or self.x == 6 or self.x == 7 or self.x == 8 or self.x == 9:
+            self.y = int(input('Quantity needed?: '))
+            while True:
+                if self.y >= 10 or self.y < 0:
+                    self.y = int(input('Sorry cannot take in these inputs. Please try again: '))
+                else:
+                    break
+        return self.y
+    
+    def continue_shopping(self):
+        while True:
+            self.user_input = input('Do you want to continue shopping? Enter y or n: ')
+            print()
+            if self.user_input != 'y' and self.user_input!= 'n':
+                print('Invalid response, please try again!: ')
+            else:
+                break
+        return self.user_input
+
+class CustomerBasket(InventoryList):
+    
+    def __init__(self):
+        self.item_list = {}
+        self.price_output = 0
+        
+    def price(self,x,y):
+        self.price_output = price_list[x]*y
+        return float(self.price_output)
+    
+    def items(self,x):
+        self.item_list[selection_list[x]] = self.price_output
+        return self.item_list
+    
+    def receipt(self):
+        print('\n')
+        print('Your items are: ')
+        for index in self.item_list:
+            print(index + ':' + '$' + str(float(self.item_list[index])))
+        
+    def totalamount(self):
+        count = 0
+        for index in self.item_list:
+            count += self.item_list[index]
+        
+        return count
+
+class Money:
+    
+    def __init__(self):
+
+        while True:
+            try:
+                self.user_defined = float(input('How much do you want to spend?: '))
+            except:
+                print('Invalid response. Please try again!: ')
+            else:
+                if self.user_defined < 0:
+                    print('Please enter positive values: ')
+                else:
+                    break
+while True:
+    #Welcomes the customer by printing a message
+    print('Welcome to Alpha Vending Machine')
+
+    #Assigning instances to objects
+    money_entered = Money()
+    invent = InventoryList()
+    customer_basket = CustomerBasket()
+
+    #Asking the user to input the amount of money they want to spend
+    #Checks to see if the amount is an integer
+    money_amount = money_entered.user_defined
+    
+    shopping = True
+    while shopping:
+
+        #Asking the customer to select the choices and quantity
+        invent.options_list()
+        options = invent.select_option()
+        quantity = invent.quantity_needed()
+        continueshop = invent.continue_shopping()
+        if continueshop == 'y':
+            customer_basket.price(options,quantity)
+            customer_basket.items(options)
+            continue
+        elif continueshop == 'n':
+            customer_basket.price(options,quantity)
+            customer_basket.items(options)
+            break
+            shopping = False
+    
+    #Prints out the inventory that the customer has selected and the price
+    customer_basket.receipt()
+    total_amount = customer_basket.totalamount()
+    print('Total amount is ${}'.format(float(total_amount)))
+  
+    #If customer purchased items less than the price entered, give the change back
+    if total_amount <= money_amount:
+        difference =  money_amount - total_amount
+        print('\n')
+        print('Your change is ${}'.format(float(difference)))
+
+
+    #If customer purchased items more than the price entered, give the entire money back
+    elif total_amount > money_amount:
+        print('\n')
+        print('Sorry, you do not have enough money to buy the items selected')
+        print('Here is your money of ${} back'.format(float(money_amount)))
+
+
+    #Thanks the customer for using the vending machine
+    print('\n')
+    print('Thank you for using Alpha Vending Machine')
+    break
