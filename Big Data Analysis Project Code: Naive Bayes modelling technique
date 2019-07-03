@@ -1,0 +1,52 @@
+setwd("C:/Users/Karan/Desktop")
+
+experiment_data.material.2 = na.exclude(experiment_data.material.2)
+
+
+#Part 1 code
+install.packages("rpart.plot")
+library("rpart")
+library("rpart.plot")
+fit_material1 = rpart(Material.fail ~ time, method = "class", data = experiment_data.material.1, control = rpart.control(minsplit = 1), parms = list(split = 'information'))
+rpart.plot(fit_material1, type=4, extra=2, clip.right.labs=FALSE, varlen=0, faclen=3)
+
+fit_material2 = rpart(Material.fail ~ time, method = "class", data = experiment_data.material.2, control = rpart.control(minsplit = 1), parms = list(split = 'information'))
+rpart.plot(fit_material2, type=4, extra=2, clip.right.labs=FALSE, varlen=0, faclen=3)
+
+
+#Part 2 code
+library(ROCR)
+install.packages("e1071")
+library(e1071)
+
+model = naiveBayes(Material.fail~ time, data = experiment_data.material.1)
+results = predict(model,experiment_data.material.1[,-ncol(experiment_data.material.1)], type = 'raw')
+score = results[, c("Yes")]
+
+actual_class = experiment_data.material.1$Material.fail == 'Yes'
+
+predObj = prediction(score,actual_class)
+
+perf = performance(predObj, "tpr", "fpr")
+
+plot(perf,lwd = 2, xlab = "False Positive Rate (FPR)", ylab = "True Positive Rate (TPR)")
+abline(a=0, b=1, col="gray50", lty=3)
+auc = performance(predObj, "auc")
+auc = unlist(slot(auc, "y.values"))
+
+
+model2 = naiveBayes(Material.fail~ time, data = experiment_data.material.2)
+results = predict(model,experiment_data.material.2[,-ncol(experiment_data.material.2)], type = 'raw')
+score = results[, c("Yes")]
+
+actual_class = experiment_data.material.2$Material.fail == 'Yes'
+
+predObj = prediction(score,actual_class)
+
+perf = performance(predObj, "tpr", "fpr")
+
+plot(perf,lwd = 2, xlab = "False Positive Rate (FPR)", ylab = "True Positive Rate (TPR)")
+abline(a=0, b=1, col="gray50", lty=3)
+
+auc = performance(predObj, "auc")
+auc = unlist(slot(auc, "y.values"))
